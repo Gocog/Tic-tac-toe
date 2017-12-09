@@ -1,0 +1,56 @@
+﻿<Page x:Class="Tictactoe.View.GamePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:VM="clr-namespace:Tictactoe.ViewModel"
+      xmlns:cvt="clr-namespace:Tictactoe.View.Converters"
+      mc:Ignorable="d" 
+      Title="GamePage"
+      >
+    <Page.DataContext>
+        <VM:GameVM/>
+    </Page.DataContext>
+    <Page.Resources>
+        <cvt:CellStateToStringConverter x:Key="cellstateconverter" A="X" B="O"/>
+        <cvt:GameStateToVisibilityConverter x:Key="visibleplayingconverter" VisibleValue="playing"/>
+        <cvt:GameStateToVisibilityConverter x:Key="visiblevictoryconverter" VisibleValue="victory"/>
+        <cvt:GameStateToVisibilityConverter x:Key="visibledrawconverter" VisibleValue="draw"/>
+        <DataTemplate x:Key="GameButton">
+            <Button Command="{Binding DataContext.GridButtonCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
+                    CommandParameter="{Binding}" Content="{Binding State, Converter={StaticResource cellstateconverter}}"
+                    Width="{Binding CellSize}"
+                    Height="{Binding CellSize}"
+                    FontSize="{Binding FontSize}"
+                    >
+            </Button>
+        </DataTemplate>
+        <DataTemplate x:Key="GameGrid">
+            <ItemsControl ItemsSource="{Binding}" ItemTemplate="{DynamicResource GameButton}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </DataTemplate>
+    </Page.Resources>
+    <StackPanel>
+        <Label Content="Tic tac toe!" FontWeight="Bold"/>
+        <Label Content="{Binding Turn, Converter={StaticResource cellstateconverter}}" ContentStringFormat="It's {0}'s turn."
+               Visibility="{Binding Status, Converter={StaticResource visibleplayingconverter}}"/>
+        <Label Content="{Binding Turn, Converter={StaticResource cellstateconverter}}" ContentStringFormat="{}{0} won the game!"
+               Visibility="{Binding Status, Converter={StaticResource visiblevictoryconverter}}"/>
+        <Label Content="Game was a draw!"
+               Visibility="{Binding Status, Converter={StaticResource visibledrawconverter}}"/>
+
+        <Grid ShowGridLines="True" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+            <ItemsControl x:Name="GameBoardGrid" ItemsSource="{Binding Board}" ItemTemplate="{StaticResource GameGrid}"/>
+        </Grid>
+        <Separator/>
+        <StackPanel Width="200">
+            <Button Margin="5" Content="Restart" Command="{Binding RestartGameCommand}" />
+            <Button Margin="5" Content="Exit" CommandParameter="/View/StartPage.xaml" Command="{Binding Path=DataContext.GoToPageCommand, RelativeSource={RelativeSource AncestorType={x:Type NavigationWindow}}}"/>
+        </StackPanel>
+    </StackPanel>
+</Page>
